@@ -8,7 +8,7 @@ import (
 
 /*
 route table:
-	HTTPMethod => Controller list
+	HTTPMethod => Controllers tree
 */
 type Route struct {
 	table map[string]*routeNode
@@ -25,7 +25,7 @@ func NewRoute() *Route {
 
 // nodes of route tree
 type routeNode struct {
-	children map[string]*routeNode // child nodes, in practical, it will be automatically sorted to accelerate search
+	children map[string]*routeNode // child nodes
 	wildcard *routeNode
 	param    string
 	handler  http.HandlerFunc
@@ -84,7 +84,7 @@ func (route *Route) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		query[k] = strings.Join(v, "")
 	}
 
-	// parse path, use regex
+	// parse path
 	table := route.table[method]
 	param := make(map[string]string)
 	for _, path := range strings.Split(r.URL.Path, "/") {
